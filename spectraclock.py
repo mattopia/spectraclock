@@ -18,27 +18,24 @@ def formatTime(t, ss = " "):
     # Return binary encoded time in Symmetricom Format 1
     # t = Time to return formatted, in struct_time format
     # ss = Sync status; " " (space) indicates good, ? and * indicate bad
-    dn = time.strftime("%a", t).upper()
-    d = re.sub("^0", " ", str(time.strftime("%d", t)))
-    m = time.strftime("%b", t).upper()
-    y = time.strftime("%y", t)
+    day = time.strftime("%a", t)
+    dmy = re.sub("^0", " ", str(time.strftime("%d%b%y`", t)))
     hms = time.strftime("%H:%M:%S", t)
-    string = "\r\n" + ss + " " + dn + " " + d + m + y + " " + hms + "\r\n"
-    return str.encode(string)
+    string = "\r\n" + ss + " " + day + " " + dmy + " " + hms + "\r\n"
+    return str.encode(string.upper())
 
-def sendTime(ser, args):
-    if args.unsync:
+def sendTime(ser, unsync = False, utc = False, debug = False):
+    if unsync:
         ss = "*"
     else:
         ss = " "
-    if args.utc:
+    if utc:
         t = time.gmtime()
     else:
-        #t = time.strptime("10 Apr 20", "%d %b %y")
         t = time.localtime()
     msg = formatTime(t, ss)
     ser.write(msg)
-    if args.debug:
+    if debug:
         print(msg)
 
 def main(args = parseArgs()):
@@ -46,7 +43,7 @@ def main(args = parseArgs()):
     s = sched.scheduler(time.time, time.sleep)
     while True:
         s.enterabs(int(time.time()) + 1, 1, sendTime, 
-                kwargs={'ser': ser, 'args': args})
+            kwargs={'ser': ser, 'unsync': args.unsync, 'utc': args.utc, 'debug': args.debug})
         s.run()
 
 if __name__ == "__main__":
