@@ -19,20 +19,13 @@ def formatTime(t, ss = " "):
     # t = Time to return formatted, in struct_time format
     # ss = Sync status; " " (space) indicates good, ? and * indicate bad
     day = time.strftime("%a", t)
-    dmy = re.sub("^0", " ", str(time.strftime("%d%b%y`", t)))
+    dmy = re.sub("^0", " ", str(time.strftime("%d%b%y", t)))
     hms = time.strftime("%H:%M:%S", t)
-    string = "\r\n" + ss + " " + day + " " + dmy + " " + hms + "\r\n"
-    return str.encode(string.upper())
+    return str.encode(f"\r\n{ss} {day} {dmy} {hms}\r\n".upper())
 
 def sendTime(ser, unsync = False, utc = False, debug = False):
-    if unsync:
-        ss = "*"
-    else:
-        ss = " "
-    if utc:
-        t = time.gmtime()
-    else:
-        t = time.localtime()
+    ss = "*" if unsync else " "
+    t = time.gmtime() if utc else time.localtime()
     msg = formatTime(t, ss)
     ser.write(msg)
     if debug:
