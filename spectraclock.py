@@ -16,23 +16,24 @@ def parseArgs():
     return p.parse_args()
 
 def checkNtpSync(debug = False):
-    p = subprocess.Popen(['chronyc', '-c', 'tracking'], 
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # Check synchronization status of a local chrony NTP service
+    # Returns true if synchronized within +/- 0.1 second offset
+    p = subprocess.Popen(['chronyc', '-c', 'tracking'], stdout=subprocess.PIPE)
     try:
-        output, errors = p.communicate(timeout = 0.1)
+        output = p.communicate(timeout = 0.1)[0]
         if debug:
-            print(f'chrony stdout: {output}')
-            print(f'chrony stderr: {errors}')
+            print(output.decode())
     except subprocess.TimeoutExpired:
         print("NTP Check - Timeout Exceeded")
         p.kill()
         return False
-    status = output.decode().split(",")[0]
-    offset = float(output.decode().split(",")[4])
-    if offset > 0.1 or offset < -0.1:
-        return False
-    if status != "00000000" and p.returncode == 0:
-        return True
+    if p.returncode == 0:
+        status = output.decode().split(",")[0]
+        offset = float(output.decode().split(",")[4])
+        if status != "00000000" and offset < 0.1 and offset > -0.1:
+            return True
+        else:
+            return False
     else:
         return False
 
@@ -49,10 +50,10 @@ def sendTime(ser, sync = True, utc = False, debug = False):
     ss = " " if sync else "?"
     t = time.gmtime() if utc else time.localtime()
     msg = formatTime(t, ss)
+    ser.write(msg)
     if debug:
         print(time.time())
         print(msg)
-    ser.write(msg)
 
 def main(args = parseArgs()):
     try:
