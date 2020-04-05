@@ -3,10 +3,10 @@ It describes the protocol emulated in detail.  It's included for reference.
 
 This script is believed to fully support this protocol as documented, however
 it has only been tested with one Spectracom device.  The very end of this
-specitication notes a possible variation of the protocol.  This script uses
-the more common space version of the protocol, not the leading zero version.
-The script can be easily modified to include leading zeroes by removing the
-regular expression that removes it in the formatTime() function.
+specification notes a possible variation of the protocol.  This script uses
+the more common space paddedversion of the protocol, without leading zeroes..
+The script can be easily modified to use leading zeroes by removing the
+regular expression in the formatTime() function.
 
 ---
 
