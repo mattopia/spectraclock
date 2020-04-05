@@ -38,9 +38,11 @@ sudo apt install chrony
 
 The default chrony configuration should be sufficient, however you are encouraged to research and modify the configuration to your liking.
 
-## Raspberry PI Notes
+## Raspberry Pi Notes
 
-The Raspberry Pi family of devices are ideal for this purpose.  It's particularly useful that every model includes an on-board serial port.  If you are using a Pi device and the Raspbian Linux distribution, you will likely need to make a few configuration changes to configure the on-board serial port.  Namely, you will want to turn off Bluetooth (optional but recommended) and configure Linux to not use the serial port as a console.  More information can be found here:
+The Raspberry Pi family of devices are ideal for this purpose, and it's what I'd recommend if you don't already have something else laying around you wish to use.  I also recommend the Raspbian operating system.  It's lightweight, easy to install, and there's plenty of documentation out there on how to do it without even needing to attach a keyboard / mouse.  I recommend using the light version of Raspbian, as you will not need any desktop features.
+
+It's particularly useful that every model includes an on-board serial port.  If you are using a Pi device and the Raspbian Linux distribution, you will likely need to make a few configuration changes to configure the on-board serial port.  Namely, you will want to turn off Bluetooth (optional but recommended) and configure Linux to not use the serial port as a console.  More information can be found here:
 
 https://www.raspberrypi.org/documentation/configuration/uart.md
 
@@ -50,7 +52,7 @@ Some Pi variants, notably the Zero and Zero W, do not ship with header pins.  If
 
 ## Installation
 
-1) Download the latest copy of spectraclock.py, place it somewhere convenient, and make it executable:
+1) Download the latest copy of the script, place it somewhere convenient, and make it executable:
 
 ```
 wget https://raw.githubusercontent.com/mattopia/spectraclock/master/spectraclock.py
@@ -60,14 +62,16 @@ sudo chmod 755 /usr/local/bin/spectraclock.py
 
 2) Manually run the script in debug mode.
 
-```spectraclock.py --debug /dev/ttyAMA0```
+```
+spectraclock.py --debug /dev/ttyAMA0
+```
 
 Change `/dev/ttyAMA0` to your appropriate serial device.  If you are using a Pi, this should be either `/dev/ttyAMA0` or `/dev/ttyS0`, depending on your configuration.  If you have properly wired your clock, after a few seconds you should see the clock set itself to match your system's current time.  If all is working well, Press Ctrl-C to exit the script.
 
 3) Grab a copy of the example systemd unit file and place it in the appropriate location:
 
 ```
-wget https://github.com/mattopia/spectraclock/blob/master/spectraclock.service
+wget https://raw.githubusercontent.com/mattopia/spectraclock/master/spectraclock.service
 sudo mv spectraclock.service /etc/systemd/system
 ```
 
@@ -82,3 +86,13 @@ sudo systemctl start spectraclock.service
 ```
 
 At this point, you should be all set!  Reboot your pi to make sure everything works after a reboot.  Find a nice way to mount everything and enjoy!
+
+## Troubleshooting
+
+If the script gives you errors, read the text and use a little deductive reasoning.  A few common issues might include using the wrong serial device, missing one or more Python modules, forgetting to make the script executable, etc.
+
+If the script runs, but the time does not sync, first check all of your hardware connections.  The RS-485 converter should have an LED that blinks every second.  If you don't see this blink, there's probably a connection problem between the converter and the compute device, or you specified the wrong serial device.  Try `/dev/ttyS0` instead of `/dev/ttyAMA0`.  Also try flipping the send/receive wires, as some RS-485 boards seem to be labeled in reverse of what you'd expect.
+
+If the light is blinking every second, check the wiring between the RS-485 adapter and the clock.  It should go straight through, i.e. + to +, - to -, gnd to gnd.  Also try flipping the send/receive wires.
+
+If the clock is synchronizing but the seconds digits are flashing, the script is likely sending an unsynchronized flag.  Try running the script without `--ntp` and see if the issue goes away.  If it does, make sure you have chrony properly installed and configured.  Or, simply exclude the `--ntp` flag in your systemd unit file.
