@@ -31,10 +31,7 @@ def checkNtpSync(debug = False):
         offset = float(output.decode().split(",")[4])
         if refclock != "00000000" and offset < 0.1 and offset > -0.1:
             return True
-        else:
-            return False
-    else:
-        return False
+    return False
 
 def formatTime(t, ss = " "):    
     # Return binary encoded time in Spectracom Format 1
@@ -57,8 +54,8 @@ def main(args = parseArgs()):
     try:
         sync = True
         ser = serial.Serial(args.dev, 9600)
-        c = args.ntp
         s = sched.scheduler(time.time, time.sleep)
+        c = args.ntp
         while True:
             if args.ntp > 0:
                 c += 1
