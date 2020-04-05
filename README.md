@@ -66,7 +66,9 @@ sudo chmod 755 /usr/local/bin/spectraclock.py
 spectraclock.py --debug /dev/ttyAMA0
 ```
 
-Change `/dev/ttyAMA0` to your appropriate serial device.  If you are using a Pi, this should be either `/dev/ttyAMA0` or `/dev/ttyS0`, depending on your configuration.  If you have properly wired your clock, after a few seconds you should see the clock set itself to match your system's current time.  If all is working well, Press Ctrl-C to exit the script.
+Change `/dev/ttyAMA0` to your appropriate serial device.  If you are using a Pi, this should be either `/dev/ttyAMA0` or `/dev/ttyS0`, depending on your configuration.  
+
+If everything is properly wired, you should see the clock set itself to match your system's current time within a few seconds.  If your clock does not properly synchronize, stop here and review the troubleshooting section.  If all is working well, Press Ctrl-C to exit the script.
 
 3) Grab a copy of the example systemd unit file and place it in the appropriate location:
 
@@ -96,3 +98,5 @@ If the script runs, but the time does not sync, first check all of your hardware
 If the light is blinking every second, check the wiring between the RS-485 adapter and the clock.  It should go straight through, i.e. + to +, - to -, gnd to gnd.  Also try flipping the send/receive wires.
 
 If the clock is synchronizing but the seconds digits are flashing, the script is likely sending an unsynchronized flag.  Try running the script without `--ntp` and see if the issue goes away.  If it does, make sure you have chrony properly installed and configured.  Or, simply exclude the `--ntp` flag in your systemd unit file.
+
+If the time is synchronizing but it's incorrect, run the script in debug mode and look at the time messages being sent.  If they match the clock, check your Pi's system time.  The Pi doesn't have an on-board clock and it _must_ synchronize over the Internet.  Check your network configuration and your timezone configuration.  If you installed chrony, make sure it's configured properly and that you disabled `systemd-timesyncd`.
