@@ -11,8 +11,7 @@ def parseArgs():
     p = argparse.ArgumentParser(description='Synchronize attached Spectracom RS-485 clock(s).')
     p.add_argument('dev', help='Serial device (i.e. /dev/ttyAMA0)')
     p.add_argument('--debug', action='store_true', help='Enable debug output.')
-    p.add_argument('--utc', action='store_true', help='Output UTC time instead of local time.')
-    p.add_argument('--ntp', type=int, default=0, help='Check NTP interval, zero to disable.')
+    p.add_argument('--ntp', type=int, default=0, help='Check NTP interval, disabled by default.')
     return p.parse_args()
 
 def checkNtpSync(debug = False):
@@ -28,9 +27,9 @@ def checkNtpSync(debug = False):
         p.kill()
         return False
     if p.returncode == 0:
-        status = output.decode().split(",")[0]
+        refclock = output.decode().split(",")[0]
         offset = float(output.decode().split(",")[4])
-        if status != "00000000" and offset < 0.1 and offset > -0.1:
+        if refclock != "00000000" and offset < 0.1 and offset > -0.1:
             return True
         else:
             return False
@@ -46,10 +45,9 @@ def formatTime(t, ss = " "):
     hms = time.strftime("%H:%M:%S", t)
     return str.encode(f"\r\n{ss} {day} {dmy} {hms}\r\n".upper())
 
-def sendTime(ser, sync = True, utc = False, debug = False):
+def sendTime(ser, sync = True, debug = False):
     ss = " " if sync else "?"
-    t = time.gmtime() if utc else time.localtime()
-    msg = formatTime(t, ss)
+    msg = formatTime(time.localtime(), ss)
     ser.write(msg)
     if debug:
         print(time.time())
@@ -70,7 +68,7 @@ def main(args = parseArgs()):
                     print(f"NTP status: {sync}")
                 c = 0
             s.enterabs(int(time.time()) + 1, 1, sendTime, 
-                kwargs={'ser': ser, 'sync': sync, 'utc': args.utc, 'debug': args.debug})
+                kwargs={'ser': ser, 'sync': sync, 'debug': args.debug})
             s.run()
     except KeyboardInterrupt:
         print("Exiting...")
