@@ -1,0 +1,66 @@
+The following is an excerpt from the Spectracom 9188 time server manual.
+It describes the protocol emulated in detail.  It's included for reference.
+
+This script is believed to fully support this protocol as documented, however
+it has only been tested with one Spectracom device.  The very end of this
+specitication notes a possible variation of the protocol.  This script uses
+the more common space version of the protocol, not the leading zero version.
+The script can be easily modified to include leading zeroes by removing the
+regular expression that removes it in the formatTime() function.
+
+---
+
+6.2    Format 1:
+
+This format provides the fully decoded time data stream. Format 1 converts
+the received day of year data (001-366) to a date consisting of day of week,
+month, and day of the month. Format 1 also  contains  a  time  sync  status
+character, year, and time reflecting time zone offset and DST correction when
+enabled. 
+
+Format 1 data structure is shown below: 
+
+CR LF I ^ WWW ^ DDMMMYY ^ HH:MM:SS CR LF 
+
+where: 
+
+CR  =   Carriage Return  
+LF  =   Line Feed
+I   =   Time Sync Status (space, ?, *)    
+^   =   space separator
+WWW =   Day of Week (SUN, MON, TUE, WED, THU, FRI, SAT) 
+DD  =   Numerical Day of Month (^1-31)
+MMM =   Month (JAN, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC) 
+YY  =   Year without century (99, 00, 01 etc.) 
+HH  =   Hours (00-23)     
+:   =   Colon separator 
+MM  =   Minutes (00-59)  
+SS  =   Seconds (00 - 60) 
+
+The leading edge of the first character (CR) marks the on-time point of the
+data stream. The time sync status character I is defined as described below: 
+
+(Space) =  Whenever the front panel Time Sync lamp is green. 
+?       =  When the receiver is unable to track any satellites
+           and the Time Sync lamp is red.
+*       =  When the receiver time is derived from the battery backed clock or
+           set manually through the Setup Port Interface. 
+
+Example: * FRI 20APR01 12:45:36 
+
+The example data stream provides the following information: 
+
+Sync Status: The clock is not time synchronized to GPS. Time is derived from 
+             the battery backed clock or set manually 
+Date:        Friday, April 20, 2001 
+Time:        12:45:36 
+
+Note:  Data Format 1 has a possible modification that may be made to the data
+stream structure.  Most external systems utilizing Data Format 1 will look for
+a single digit day of the month for day 1 through day 9, with a space in front
+of each digit ( ^1, ^2, ^3 ... 10,11... ) whereas other systems need to see a
+two digit day of the month for all days 1 through 9 with a leading 0 instead
+of a space (01, 02, 03... 10,11...)
+
+If your device requires the two digit day of the month for days 1 through 9,
+the following procedure will change the Data Format 1 structure to provide this. 

@@ -12,7 +12,7 @@ def parseArgs():
     p.add_argument('dev', help='Serial device (i.e. /dev/ttyAMA0)')
     p.add_argument('--debug', action='store_true', help='Enable debug output.')
     p.add_argument('--utc', action='store_true', help='Output UTC time instead of local time.')
-    p.add_argument('--ntp', type=int, default=60, help='Check NTP interval, zero to disable.')
+    p.add_argument('--ntp', type=int, default=0, help='Check NTP interval, zero to disable.')
     return p.parse_args()
 
 def checkNtpSync(debug = False):
@@ -46,7 +46,7 @@ def formatTime(t, ss = " "):
     return str.encode(f"\r\n{ss} {day} {dmy} {hms}\r\n".upper())
 
 def sendTime(ser, sync = True, utc = False, debug = False):
-    ss = " " if sync else "*"
+    ss = " " if sync else "?"
     t = time.gmtime() if utc else time.localtime()
     msg = formatTime(t, ss)
     if debug:

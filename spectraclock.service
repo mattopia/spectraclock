@@ -1,0 +1,12 @@
+[Unit]
+Description=Spectracom time synchronization service
+After=chrony.service
+Requires=chrony.service
+
+[Service]
+ExecStart=/usr/local/bin/spectraclock.py /dev/ttyAMA0 --ntp 300
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

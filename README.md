@@ -1,10 +1,10 @@
 # spectraclock.py
 
-A Spectracom "Format 1" time message format emulator.  Messages are sent at the top of every second and output to a serial port.  This is useful for feeding time data to Spectracom clocks.  This script has been tested on a Raspberry Pi Zero W and a Spectracom model 8177 TimeView 400 LED clock.  It should work on any UNIX-y platform with any devices that supports "Format 1" messages.
+A Spectracom "Format 1" time message format emulator.  Messages are sent at the top of every second and output to a serial port.  This is useful for feeding time data to Spectracom clocks.  This script has been tested on various Raspberry Pi's and a Spectracom model 8177 TimeView 400 LED clock.  It should work on any UNIX-y platform with any devices that support "Format 1" messages.
 
 # Background 
 
-I have an obsession with interesting clocks and acquired a Spectracom 8177 TimeView 400 clock from eBay.  It was previously installed in a 911 call center, and it was now in my basement.  The TimeView 400 can be manually set and seems to keep relatively good time on its own, but it's designed to synchronize with a master clock, such as NetClock models 9183 or 9188.  I wanted to keep the clock synchronized witout the use of wiring or external devices.  I wanted to use a microcontroller, such as a Raspberry Pi Zero W, to keep the clock synchronized with a time (NTP) server.
+I have an obsession with interesting clocks and acquired a Spectracom 8177 TimeView 400 clock from eBay.  It was previously installed in a 911 call center, and it was now in my basement.  The TimeView 400 can be manually set and seems to keep relatively good time on its own, but it's designed to synchronize with a master clock, such as NetClock models 9183 or 9188.  I wanted to keep the clock synchronized witout the use of wiring or external devices.  I wanted to use a microcontroller, such as a Raspberry Pi, to keep the clock synchronized with a time (NTP) server.
 
 Two pieces of glue would be necessary to make this happen.  First, the physical glue -- connecting a Raspberry Pi to the clock.  The TimeView 400 uses an RS-485 connection, and the Raspberry Pi's onboard serial ports use TTL (0 - 5 volt) logic levels.  A number of converters are readily available on Amazon for this purpose, most for under $10.  This made the physical glue pretty much plug and play.
 
